@@ -26,72 +26,68 @@ public final class Game {
 	}
 	
 	public void Init() {
-		Cell snakeHead = matrix[snake.SnakeCells[0].y][snake.SnakeCells[0].x];
-		if (matrix[snakeHead.y][snakeHead.x].getClass() == FoodCell.class) {
-			SnakeCell[] newSnake = new SnakeCell[snake.SnakeCells.length + 1]; // max access s.s.length
-			
-			int j = 0;
-			while(j < snake.SnakeCells.length) {
-				newSnake[j] = new SnakeCell(snake.SnakeCells[j].x, snake.SnakeCells[j].y, j);
-				j++;
-			}
-			
-			switch(HeadDirection) {
-				case 'L':
-					newSnake[j] = new SnakeCell(
-						newSnake[j-1].x + 1,
-						newSnake[j-1].y,
-						j
-					);
-					break;
-				case 'R':
-					newSnake[j] = new SnakeCell(
-						newSnake[j-1].x - 1,
-						newSnake[j-1].y,
-						j
-					);
-					break;
-				case 'U':
-					newSnake[j] = new SnakeCell(
-						newSnake[j-1].x,
-						newSnake[j-1].y + 1,
-						j
-					);
-					break;
-				case 'D':
-					newSnake[j] = new SnakeCell(
-						newSnake[j-1].x,
-						newSnake[j-1].y - 1,
-						j
-					);
-					break;
-			}
-			for(int i = 0; i < matrix.length; i++) {
-				for(int k = 0; k < matrix[0].length; k++) {
-					matrix[i][k] = new Cell(k, i);
+		try {
+			Cell snakeHead = matrix[snake.SnakeCells[0].y][snake.SnakeCells[0].x];
+			if (matrix[snakeHead.y][snakeHead.x].getClass() == FoodCell.class) {
+				SnakeCell[] newSnake = new SnakeCell[snake.SnakeCells.length + 1];
+				
+				int j = 0;
+				while(j < snake.SnakeCells.length) {
+					newSnake[j] = new SnakeCell(snake.SnakeCells[j].x, snake.SnakeCells[j].y, j);
+					j++;
 				}
+				
+				switch(HeadDirection) {
+					case 'L':
+						newSnake[j] = new SnakeCell(
+							newSnake[j-1].x + 1,
+							newSnake[j-1].y,
+							j
+						);
+						break;
+					case 'R':
+						newSnake[j] = new SnakeCell(
+							newSnake[j-1].x - 1,
+							newSnake[j-1].y,
+							j
+						);
+						break;
+					case 'U':
+						newSnake[j] = new SnakeCell(
+							newSnake[j-1].x,
+							newSnake[j-1].y + 1,
+							j
+						);
+						break;
+					case 'D':
+						newSnake[j] = new SnakeCell(
+							newSnake[j-1].x,
+							newSnake[j-1].y - 1,
+							j
+						);
+						break;
+				}
+				for(int i = 0; i < matrix.length; i++) {
+					for(int k = 0; k < matrix[0].length; k++) {
+						matrix[i][k] = new Cell(k, i);
+					}
+				}
+				snake.SnakeCells = newSnake;
+				snake.length++;
 			}
-			snake.SnakeCells = newSnake;
-			snake.length++;
+		} catch(Exception e) {
+			GameOver();
 		}
+		
 		snakeCells = snake.SnakeCells;
 		
 		for(int i = 0; i < snakeCells.length; i++) {
 			if (snakeCells[i].y >= matrix.length || snakeCells[i].x >= matrix[0].length
-					|| snakeCells[i].y < 0 || snakeCells[i].x < 0) {
-				for(int j = 0; j < matrix.length; j++) {
-					for(int k = 0; k < matrix[0].length; k++) {
-						matrix[j][k] = new Cell(k, j);
-					}
-				}
-				Running = false;
-			} else matrix[snakeCells[i].y][snakeCells[i].x] = snakeCells[i];
-//				matrix
-//				[snake.SnakeCells[snake.SnakeCells.length - 1].y]
-//				[snake.SnakeCells[snake.SnakeCells.length - 1].x]
-//					= snake.SnakeCells[snake.SnakeCells.length - 1];
+					|| snakeCells[i].y < 0 || snakeCells[i].x < 0) GameOver();
+			else if ((i != 0) && (snakeCells[0].x == snakeCells[i].x) && (snakeCells[0].y == snakeCells[i].y))
+				GameOver();
+			else matrix[snakeCells[i].y][snakeCells[i].x] = snakeCells[i];
 		}
-		
 		
 		int foodNum = 0;
 		
@@ -108,6 +104,15 @@ public final class Game {
 			
 			if (matrix[y][x].getClass() != SnakeCell.class) matrix[y][x] = new FoodCell(x, y);
 		}
+	}
+	
+	private void GameOver() {
+		for(int j = 0; j < matrix.length; j++) {
+			for(int k = 0; k < matrix[0].length; k++) {
+				matrix[j][k] = new Cell(k, j);
+			}
+		}
+		Running = false;
 	}
 	
 	public void UpdateMatrix() {
